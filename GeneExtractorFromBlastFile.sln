@@ -1,0 +1,22 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneExtractorFromBlastFile", "GeneExtractorFromBlastFile\GeneExtractorFromBlastFile.csproj", "{DA6B709C-3CD2-425E-ABB8-7F606780B78E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GeneExtractorTest", "GeneExtractorTest\GeneExtractorTest.csproj", "{B9B5BFF7-ACC0-4F57-B308-1DD47FD06B3D}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{DA6B709C-3CD2-425E-ABB8-7F606780B78E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DA6B709C-3CD2-425E-ABB8-7F606780B78E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DA6B709C-3CD2-425E-ABB8-7F606780B78E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DA6B709C-3CD2-425E-ABB8-7F606780B78E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B9B5BFF7-ACC0-4F57-B308-1DD47FD06B3D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B9B5BFF7-ACC0-4F57-B308-1DD47FD06B3D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B9B5BFF7-ACC0-4F57-B308-1DD47FD06B3D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B9B5BFF7-ACC0-4F57-B308-1DD47FD06B3D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
