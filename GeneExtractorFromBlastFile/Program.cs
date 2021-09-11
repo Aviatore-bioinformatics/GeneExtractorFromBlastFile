@@ -49,6 +49,15 @@ namespace GeneExtractorFromBlastFile
             BlastReader blastReader = new BlastReader(logger, validCds, commandLineOptions.Value.LengthThreshold);
             blastReader.ReadBlast(blastFilePath);
 
+            PrintQueries(blastReader);
+            
+            blastReader.FilterQueries();
+            
+            PrintQueries(blastReader);
+        }
+
+        static void PrintQueries(BlastReader blastReader)
+        {
             foreach (var query in blastReader.Queries)
             {
                 Console.Out.WriteLine($"Query name: {query.Name}, cds:");
