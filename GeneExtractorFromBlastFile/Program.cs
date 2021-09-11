@@ -3,6 +3,7 @@ using System.IO;
 using System.Linq;
 using GeneExtractorFromBlastFile.Models;
 using GeneExtractorFromBlastFile.Services;
+using GeneExtractorFromBlastFile.View;
 using Microsoft.Extensions.Configuration;
 using Serilog;
 
@@ -54,6 +55,10 @@ namespace GeneExtractorFromBlastFile
             blastReader.FilterQueries();
             
             PrintQueries(blastReader);
+
+            TablePrinter tablePrinter =
+                new TablePrinter(blastReader, validCds, commandLineOptions.Value.OutputFileName);
+            tablePrinter.ToTable();
         }
 
         static void PrintQueries(BlastReader blastReader)
