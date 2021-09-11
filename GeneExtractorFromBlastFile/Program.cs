@@ -6,6 +6,7 @@ using GeneExtractorFromBlastFile.Services;
 using GeneExtractorFromBlastFile.View;
 using Microsoft.Extensions.Configuration;
 using Serilog;
+using Serilog.Core;
 
 namespace GeneExtractorFromBlastFile
 {
@@ -20,7 +21,7 @@ namespace GeneExtractorFromBlastFile
                 .AddJsonFile("appsettings.json")
                 .Build();
 
-            var logger = new LoggerConfiguration()
+            Logger logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration)
                 .CreateLogger();
 
@@ -50,19 +51,27 @@ namespace GeneExtractorFromBlastFile
             BlastReader blastReader = new BlastReader(logger, validCds, commandLineOptions.Value.LengthThreshold);
             blastReader.ReadBlast(blastFilePath);
 
-            PrintQueries(blastReader);
-            
-            blastReader.FilterQueries();
-            
-            PrintQueries(blastReader);
+            PrintQueries(blastReader, logger);
 
-            TablePrinter tablePrinter =
-                new TablePrinter(blastReader, validCds, commandLineOptions.Value.OutputFileName);
-            tablePrinter.ToTable();
+            try
+            {
+                blastReader.FilterQueries();
+                
+                PrintQueries(blastReader, logger);
+                
+                TablePrinter tablePrinter =
+                    new TablePrinter(blastReader, validCds, commandLineOptions.Value.OutputFileName);
+                tablePrinter.ToTable();
+            }
+            catch (ArgumentException e)
+            {
+                logger.Error(e.Message);
+            }
         }
 
-        static void PrintQueries(BlastReader blastReader)
+        static void PrintQueries(BlastReader blastReader, Logger logger)
         {
+            logger.Debug("Printing queries' CDS ...");
             foreach (var query in blastReader.Queries)
             {
                 Console.Out.WriteLine($"Query name: {query.Name}, cds:");

@@ -26,6 +26,8 @@ namespace GeneExtractorFromBlastFile.Services
 
         public void ReadBlast(string inputFilePath)
         {
+            _logger.Debug("Start reading BLAST output file ...");
+            
             StringBuilder line = new StringBuilder();
 
             using var sr = new StreamReader(inputFilePath);
@@ -50,18 +52,12 @@ namespace GeneExtractorFromBlastFile.Services
                                 var i = cds.Exons
                                     .SingleOrDefault(l => l.Name.Equals(blastLine.SubjectName));
 
-                                if (i is not null)
-                                {
-                                    Console.Out.WriteLine($"{i.Name} {i.Length}");
-                                }
-                                else
-                                {
-                                    Console.Out.WriteLine($"{cds.Name} has no exons");
-                                }
-                                    
+                                _logger.Debug(i is not null ? $"Exon {i.Name} of length {i.Length} bp present in query {query.Name} is present also in other part of the query" : $"{query.Name} {cds.Name} has no exons");
+
                                 if (i is not null && i.Length < blastLine.MatchLength)
                                 {
-                                    Console.Out.WriteLine($"removing {i.Name}");
+                                    _logger.Debug($"Exon {i.Name} of length {i.Length} bp present in query {query.Name} has longer alternative ({blastLine.MatchLength} bp). Replacing the shorter version with the longer one ...");
+                                    
                                     cds.Exons.Remove(i);
                                     cds.Exons.Add(new Exon()
                                     {
@@ -82,9 +78,10 @@ namespace GeneExtractorFromBlastFile.Services
                             {
                                 var p = cds.Exons
                                     .Where(l => l.Name.Equals(blastLine.SubjectName));
+                                _logger.Error($"CDS '{cds.Name}' has more than one exon of the same name: {blastLine.SubjectName}:");
                                 foreach (var exon in p)
                                 {
-                                    Console.Out.WriteLine($"{query.Name} name: {exon.Name}");
+                                    _logger.Error($"- query: {query.Name}, CDS: {cds.Name}, exon: {exon.Name}");
                                 }
                                 throw;
                             }
@@ -142,23 +139,34 @@ namespace GeneExtractorFromBlastFile.Services
             }
             
             //FilterQueries();
+            
+            _logger.Debug("Reading BLAST output file finished");
         }
 
         public void FilterQueries()
         {
             for (int queryIndex = Queries.Count - 1; queryIndex >= 0; queryIndex--)
             {
-                for (int index = Queries[queryIndex].Cds.Count - 1; index >= 0; index--)
+                try
                 {
-                    if (!_validCds[Queries[queryIndex].Cds[index].Name].Verify(Queries[queryIndex].Cds[index]))
+                    for (int index = Queries[queryIndex].Cds.Count - 1; index >= 0; index--)
                     {
-                        Queries[queryIndex].Cds.RemoveAt(index);
+                        if (!_validCds[Queries[queryIndex].Cds[index].Name].Verify(Queries[queryIndex].Cds[index]))
+                        {
+                            Queries[queryIndex].Cds.RemoveAt(index);
+                        }
+                    }
+
+                    if (!Queries[queryIndex].Cds.Any())
+                    {
+                        Queries.RemoveAt(queryIndex);
                     }
                 }
-                
-                if (!Queries[queryIndex].Cds.Any())
+                catch (ArgumentException e)
                 {
-                    Queries.RemoveAt(queryIndex);
+                    throw new ArgumentException($"Problem with {Queries[queryIndex].Name}. {e.Message}");
+                    _logger.Error($"Problem with {Queries[queryIndex].Name}");
+                    throw;
                 }
             }
         }

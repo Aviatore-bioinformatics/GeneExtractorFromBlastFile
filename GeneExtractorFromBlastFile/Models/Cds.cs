@@ -1,4 +1,6 @@
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace GeneExtractorFromBlastFile.Models
@@ -28,6 +30,12 @@ namespace GeneExtractorFromBlastFile.Models
 
             foreach (var exon in cds.Exons)
             {
+                var validExonLength = Exons.Single(p => p.Name.Equals(exon.Name)).Length;
+                if (validExonLength < exon.Length)
+                {
+                    throw new ArgumentException(
+                        $"Exon {exon.Name} of length {exon.Length} is longer than it should be, i.e. {validExonLength}");
+                }
                 cdsLength += exon.Length;
             }
 
