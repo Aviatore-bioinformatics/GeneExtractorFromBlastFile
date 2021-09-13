@@ -20,14 +20,8 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="Data\mt_CDS_uniqSeq.len">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </None>
       <None Update="appsettings.json">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="Data\blast.out">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
     </ItemGroup>
 

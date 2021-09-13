@@ -13,7 +13,7 @@ namespace GeneExtractorFromBlastFile.Models
 
         public ExonLine(string line)
         {
-            _cdsName = new Regex(@"^[^\s]+(?=-)");
+            _cdsName = new Regex(@"^[^\s]+(?=-ex)");
             
             var splittedLine = line.Split('\t');
             
