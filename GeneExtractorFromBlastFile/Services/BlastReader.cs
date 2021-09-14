@@ -59,7 +59,7 @@ namespace GeneExtractorFromBlastFile.Services
                                     _logger.Debug($"Exon {i.Name} of length {i.Length} bp present in query {query.Name} has longer alternative ({blastLine.MatchLength} bp). Replacing the shorter version with the longer one ...");
                                     
                                     cds.Exons.Remove(i);
-                                    cds.Exons.Add(new Exon()
+                                    cds.Exons.Add(new Exon(_lengthThreshold)
                                     {
                                         Length = blastLine.MatchLength,
                                         Name = blastLine.SubjectName
@@ -67,7 +67,7 @@ namespace GeneExtractorFromBlastFile.Services
                                 }
                                 else if (i is null)
                                 {
-                                    cds.Exons.Add(new Exon()
+                                    cds.Exons.Add(new Exon(_lengthThreshold)
                                     {
                                         Length = blastLine.MatchLength,
                                         Name = blastLine.SubjectName
@@ -96,7 +96,7 @@ namespace GeneExtractorFromBlastFile.Services
                                         Name = blastLine.CdsName,
                                         Exons = new List<Exon>()
                                         {
-                                            new Exon()
+                                            new Exon(_lengthThreshold)
                                             {
                                                 Length = blastLine.MatchLength,
                                                 Name = blastLine.SubjectName
@@ -117,7 +117,7 @@ namespace GeneExtractorFromBlastFile.Services
                                     Name = blastLine.CdsName,
                                     Exons = new List<Exon>()
                                     {
-                                        new Exon()
+                                        new Exon(_lengthThreshold)
                                         {
                                             Length = blastLine.MatchLength,
                                             Name = blastLine.SubjectName
@@ -144,6 +144,44 @@ namespace GeneExtractorFromBlastFile.Services
         }
 
         public void FilterQueries()
+        {
+            for (int queryIndex = Queries.Count - 1; queryIndex >= 0; queryIndex--)
+            {
+                try
+                {
+                    for (int cdsIndex = Queries[queryIndex].Cds.Count - 1; cdsIndex >= 0; cdsIndex--)
+                    {
+                        var cdsName = Queries[queryIndex].Cds[cdsIndex].Name;
+                        for (int exonIndex = Queries[queryIndex].Cds[cdsIndex].Exons.Count - 1;
+                            exonIndex >= 0;
+                            exonIndex--)
+                        {
+                            var exon = Queries[queryIndex].Cds[cdsIndex].Exons[exonIndex];
+                            var validCds = _validCds[cdsName].Exons.Single(p => p.Name.Equals(exon.Name));
+                            if (!validCds.Verify(exon))
+                            {
+                                _logger.Debug($"Query {Queries[queryIndex].Name} Exon {exon.Name} ({exon.Length}bp) is shorter than {_lengthThreshold}% of {validCds.Length}bp");
+                                Queries[queryIndex].Cds[cdsIndex].Exons.RemoveAt(exonIndex);
+                            }
+                        }
+                    }
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                    throw;
+                }
+            }
+
+            for (int queryIndex = Queries.Count - 1; queryIndex >= 0; queryIndex--)
+            {
+                if (!Queries[queryIndex].Cds.Any(p => p.Exons.Any()))
+                {
+                    Queries.RemoveAt(queryIndex);
+                }
+            }
+        }
+        public void FilterQueries_()
         {
             for (int queryIndex = Queries.Count - 1; queryIndex >= 0; queryIndex--)
             {

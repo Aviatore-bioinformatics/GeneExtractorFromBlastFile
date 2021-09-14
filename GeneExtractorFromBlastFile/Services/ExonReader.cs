@@ -46,7 +46,7 @@ namespace GeneExtractorFromBlastFile.Services
                                 throw new ArgumentException($"Duplicated gene name: {exonLine.ExonName}");
                             }
                             
-                            _validCds[exonLine.CdsName].Exons.Add(new Exon
+                            _validCds[exonLine.CdsName].Exons.Add(new Exon(_lengthThreshold)
                             {
                                 Name = exonLine.ExonName,
                                 Length = exonLine.ExonLength
@@ -57,7 +57,7 @@ namespace GeneExtractorFromBlastFile.Services
                             _validCds.Add(exonLine.CdsName, new Cds(_lengthThreshold)
                             {
                                 Name = exonLine.CdsName,
-                                Exons = new List<Exon>(){new Exon
+                                Exons = new List<Exon>(){new Exon(_lengthThreshold)
                                     {
                                         Name = exonLine.ExonName,
                                         Length = exonLine.ExonLength

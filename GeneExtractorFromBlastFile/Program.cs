@@ -51,13 +51,13 @@ namespace GeneExtractorFromBlastFile
             BlastReader blastReader = new BlastReader(logger, validCds, commandLineOptions.Value.LengthThreshold);
             blastReader.ReadBlast(blastFilePath);
 
-            PrintQueries(blastReader, logger);
+            //PrintQueries(blastReader, logger);
 
             try
             {
                 blastReader.FilterQueries();
                 
-                PrintQueries(blastReader, logger);
+                //PrintQueries(blastReader, logger);
                 
                 TablePrinter tablePrinter =
                     new TablePrinter(blastReader, validCds, commandLineOptions.Value.OutputFileName);
