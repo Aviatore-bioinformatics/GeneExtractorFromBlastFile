@@ -10,9 +10,9 @@ namespace GeneExtractorFromBlastFile.Services
 {
     public class ExonReader
     {
-        private Logger _logger;
-        private Dictionary<string, Cds> _validCds;
-        private float _lengthThreshold;
+        private readonly Logger _logger;
+        private readonly Dictionary<string, Cds> _validCds;
+        private readonly float _lengthThreshold;
 
         public ExonReader(Logger logger, float lengthThreshold)
         {
@@ -27,54 +27,51 @@ namespace GeneExtractorFromBlastFile.Services
         {
             StringBuilder line = new StringBuilder();
 
-            using (var sr = new StreamReader(inputFilePath))
+            using var sr = new StreamReader(inputFilePath);
+            line.Append(sr.ReadLine());
+
+            while (line.Length > 0)
             {
-                
-                line.Append(sr.ReadLine());
-
-                while (line?.Length > 0)
+                try
                 {
-                    try
-                    {
-                        var exonLine = new ExonLine(line.ToString());
+                    var exonLine = new ExonLine(line.ToString());
 
-                        if (_validCds.ContainsKey(exonLine.CdsName))
-                        {
-                            if (_validCds[exonLine.CdsName].Exons.Any(p => p.Name.Equals(exonLine.ExonName)))
-                            {
-                                _logger.Error($"Duplicated gene name: {exonLine.ExonName}");
-                                throw new ArgumentException($"Duplicated gene name: {exonLine.ExonName}");
-                            }
-                            
-                            _validCds[exonLine.CdsName].Exons.Add(new Exon(_lengthThreshold)
-                            {
-                                Name = exonLine.ExonName,
-                                Length = exonLine.ExonLength
-                            });
-                        }
-                        else
-                        {
-                            _validCds.Add(exonLine.CdsName, new Cds(_lengthThreshold)
-                            {
-                                Name = exonLine.CdsName,
-                                Exons = new List<Exon>(){new Exon(_lengthThreshold)
-                                    {
-                                        Name = exonLine.ExonName,
-                                        Length = exonLine.ExonLength
-                                    }
-                                }
-                            });
-                        }
-                    }
-                    catch (Exception e)
+                    if (_validCds.ContainsKey(exonLine.CdsName))
                     {
-                        _logger.Error(e.Message);
-                        throw;
+                        if (_validCds[exonLine.CdsName].Exons.Any(p => p.Name.Equals(exonLine.ExonName)))
+                        {
+                            _logger.Error($"Duplicated gene name: {exonLine.ExonName}");
+                            throw new ArgumentException($"Duplicated gene name: {exonLine.ExonName}");
+                        }
+                            
+                        _validCds[exonLine.CdsName].Exons.Add(new Exon(_lengthThreshold)
+                        {
+                            Name = exonLine.ExonName,
+                            Length = exonLine.ExonLength
+                        });
                     }
-                    
-                    line.Clear();
-                    line.Append(sr.ReadLine());
+                    else
+                    {
+                        _validCds.Add(exonLine.CdsName, new Cds()
+                        {
+                            Name = exonLine.CdsName,
+                            Exons = new List<Exon>(){new Exon(_lengthThreshold)
+                                {
+                                    Name = exonLine.ExonName,
+                                    Length = exonLine.ExonLength
+                                }
+                            }
+                        });
+                    }
                 }
+                catch (Exception e)
+                {
+                    _logger.Error(e.Message);
+                    throw;
+                }
+                    
+                line.Clear();
+                line.Append(sr.ReadLine());
             }
         }
     }

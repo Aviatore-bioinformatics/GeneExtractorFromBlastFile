@@ -4,9 +4,9 @@ namespace GeneExtractorFromBlastFile.Models
 {
     public class Exon
     {
-        private float _lengthThreshold;
-        public string Name { get; set; }
-        public int Length { get; set; }
+        private readonly float _lengthThreshold;
+        public string Name { get; init; }
+        public int Length { get; init; }
 
         public Exon(float lengthThreshold)
         {

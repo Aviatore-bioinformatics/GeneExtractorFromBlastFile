@@ -33,7 +33,7 @@ namespace GeneExtractorFromBlastFile.Services
             using var sr = new StreamReader(inputFilePath);
             line.Append(sr.ReadLine());
                 
-            while (line?.Length > 0)
+            while (line.Length > 0)
             {
                 try
                 {
@@ -91,7 +91,7 @@ namespace GeneExtractorFromBlastFile.Services
                             Queries.Add(new Query()
                             {
                                 Name = blastLine.QueryName,
-                                Cds = new List<Cds>(){new Cds(_lengthThreshold)
+                                Cds = new List<Cds>(){new Cds()
                                     {
                                         Name = blastLine.CdsName,
                                         Exons = new List<Exon>()
@@ -112,7 +112,7 @@ namespace GeneExtractorFromBlastFile.Services
                         Queries.Add(new Query()
                         {
                             Name = blastLine.QueryName,
-                            Cds = new List<Cds>(){new Cds(_lengthThreshold)
+                            Cds = new List<Cds>(){new Cds()
                                 {
                                     Name = blastLine.CdsName,
                                     Exons = new List<Exon>()
@@ -178,33 +178,6 @@ namespace GeneExtractorFromBlastFile.Services
                 if (!Queries[queryIndex].Cds.Any(p => p.Exons.Any()))
                 {
                     Queries.RemoveAt(queryIndex);
-                }
-            }
-        }
-        public void FilterQueries_()
-        {
-            for (int queryIndex = Queries.Count - 1; queryIndex >= 0; queryIndex--)
-            {
-                try
-                {
-                    for (int index = Queries[queryIndex].Cds.Count - 1; index >= 0; index--)
-                    {
-                        if (!_validCds[Queries[queryIndex].Cds[index].Name].Verify(Queries[queryIndex].Cds[index]))
-                        {
-                            Queries[queryIndex].Cds.RemoveAt(index);
-                        }
-                    }
-
-                    if (!Queries[queryIndex].Cds.Any())
-                    {
-                        Queries.RemoveAt(queryIndex);
-                    }
-                }
-                catch (ArgumentException e)
-                {
-                    throw new ArgumentException($"Problem with {Queries[queryIndex].Name}. {e.Message}");
-                    _logger.Error($"Problem with {Queries[queryIndex].Name}");
-                    throw;
                 }
             }
         }
